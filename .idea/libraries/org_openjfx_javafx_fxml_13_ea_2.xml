@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="org.openjfx:javafx-fxml:13-ea+2" type="repository">
+    <properties maven-id="org.openjfx:javafx-fxml:13-ea+2" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/13-ea+2/javafx-fxml-13-ea+2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/13-ea+2/javafx-fxml-13-ea+2-win.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/13-ea+2/javafx-controls-13-ea+2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/13-ea+2/javafx-controls-13-ea+2-win.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/13-ea+2/javafx-graphics-13-ea+2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/13-ea+2/javafx-graphics-13-ea+2-win.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-base/13-ea+2/javafx-base-13-ea+2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-base/13-ea+2/javafx-base-13-ea+2-win.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
