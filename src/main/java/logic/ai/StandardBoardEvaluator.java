@@ -21,6 +21,12 @@ public final class StandardBoardEvaluator implements BoardEvaluator {
                 scorePlayer(board, board.getWhitePlayer(), depth);
     }
 
+    public static int evaluateAttackedPieces(Board board, Player player){
+        return player.getOpponent().getValidMoves()
+                .stream()
+                .filter(Move::isAttack).mapToInt(move -> move.getAttackedPiece().getPieceValue()).sum();
+    }
+
     private int scorePlayer(final Board board,
                             final Player player,
                             final int depth) {

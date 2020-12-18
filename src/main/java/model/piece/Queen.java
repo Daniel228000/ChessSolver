@@ -20,14 +20,14 @@ public class Queen extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(final Board board) {
-        List<Move> moveCandidates = new ArrayList<>(bishop.getValidMoves(board,this));
-        moveCandidates.addAll(rook.getValidMoves(board,this));
+    public List<Move> getValidMoves(final Board board, final Boolean isForDefending) {
+        List<Move> moveCandidates = new ArrayList<>(bishop.getValidMoves(board,this, isForDefending));
+        moveCandidates.addAll(rook.getValidMoves(board,this, isForDefending));
         return moveCandidates;
     }
 
     @Override
-    public List<Move> getValidMoves(Board board, Piece piece) {
+    public List<Move> getValidMoves(Board board, Piece piece, Boolean isForDefending) {
         return null;
     }
 

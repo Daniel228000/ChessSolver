@@ -15,6 +15,7 @@ public class Knight extends Piece {
     private void getMoves(
             final Board board,
             final List<Move> candidates,
+            final Boolean isForDefending,
             final int rowOffset,
             final int columnOffset) {
         int position = this.getPiecePosition() + rowOffset * 8 + columnOffset;
@@ -22,7 +23,7 @@ public class Knight extends Piece {
                 && Math.abs(this.piecePosition % 8 - position % 8) <= 2
         ){
             if (board.getBoardConfig().get(position) != null){
-                if (!board.getBoardConfig().get(position).getPieceColor().equals(this.pieceColor)){
+                if (!board.getBoardConfig().get(position).getPieceColor().equals(this.pieceColor) || isForDefending){
                     candidates.add(MoveFactory.build(board, this, position));
                 }
                 return;
@@ -32,21 +33,21 @@ public class Knight extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(final Board board) {
+    public List<Move> getValidMoves(final Board board, final Boolean isForDefending) {
         List<Move> moveCandidates = new ArrayList<>();
-        getMoves(board, moveCandidates,  2, 1);
-        getMoves(board, moveCandidates,   2, -1);
-        getMoves(board, moveCandidates,  -2, 1);
-        getMoves(board, moveCandidates,   -2, -1);
-        getMoves(board, moveCandidates,  1, 2);
-        getMoves(board, moveCandidates,   1, -2);
-        getMoves(board, moveCandidates,   -1, 2);
-        getMoves(board, moveCandidates,   -1, -2);
+        getMoves(board, moveCandidates, isForDefending, 2, 1);
+        getMoves(board, moveCandidates, isForDefending,  2, -1);
+        getMoves(board, moveCandidates, isForDefending, -2, 1);
+        getMoves(board, moveCandidates, isForDefending,  -2, -1);
+        getMoves(board, moveCandidates, isForDefending, 1, 2);
+        getMoves(board, moveCandidates, isForDefending,  1, -2);
+        getMoves(board, moveCandidates, isForDefending,  -1, 2);
+        getMoves(board, moveCandidates, isForDefending,  -1, -2);
         return moveCandidates;
     }
 
     @Override
-    public List<Move> getValidMoves(Board board, Piece piece) {
+    public List<Move> getValidMoves(Board board, Piece piece, Boolean isForDefending) {
         return null;
     }
 

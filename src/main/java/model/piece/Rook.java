@@ -13,12 +13,12 @@ public class Rook extends Piece {
         super(pieceColor,  piecePosition);
     }
 
-    private List<Move> getLocalMoves(Board board, Piece piece){
+    private List<Move> getLocalMoves(Board board, Piece piece, Boolean isForDefending){
         List<Move> moveCandidates = new ArrayList<>();
-        getColumnCandidates(board, moveCandidates, piece,-1);
-        getColumnCandidates(board, moveCandidates,  piece,1);
-        getRowCandidates(board, moveCandidates,  piece,-1);
-        getRowCandidates(board, moveCandidates,  piece,1);
+        getColumnCandidates(board, moveCandidates, isForDefending, piece,-1);
+        getColumnCandidates(board, moveCandidates, isForDefending,  piece,1);
+        getRowCandidates(board, moveCandidates, isForDefending,  piece,-1);
+        getRowCandidates(board, moveCandidates, isForDefending,  piece,1);
 
         return moveCandidates;
 
@@ -27,12 +27,13 @@ public class Rook extends Piece {
     private void getRowCandidates(
             final Board board,
             final List<Move> moveCandidates,
+            final Boolean isForDefending,
             final Piece piece,
             final int offset) {
         int position = piece.getPiecePosition() + offset * 8;
         while (position >= 0 && position <= 63 && piece.piecePosition % 8 == position % 8) {
             if (board.getBoardConfig().get(position) != null) {
-                if (!board.getBoardConfig().get(position).getPieceColor().equals(piece.getPieceColor())) {
+                if (!board.getBoardConfig().get(position).getPieceColor().equals(piece.getPieceColor()) || isForDefending) {
                     moveCandidates.add(MoveFactory.build(board, piece, position));
                 }
                 return;
@@ -44,12 +45,13 @@ public class Rook extends Piece {
     private void getColumnCandidates(
             final Board board,
             final List<Move> moveCandidates,
+            final Boolean isForDefending,
             final Piece piece,
             final int offset) {
         int position = piece.getPiecePosition() + offset;
         while (position >= 0 && position <= 63 && (piece.piecePosition / 8 - position / 8) == 0){
             if (board.getBoardConfig().get(position) != null){
-                if (!board.getBoardConfig().get(position).getPieceColor().equals(piece.getPieceColor())){
+                if (!board.getBoardConfig().get(position).getPieceColor().equals(piece.getPieceColor()) || isForDefending){
                     moveCandidates.add(MoveFactory.build(board, piece, position));
                 }
                 return;
@@ -60,14 +62,15 @@ public class Rook extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(final Board board) {
-        return getLocalMoves(board, this);
+    public List<Move> getValidMoves(final Board board, final Boolean isForDefending) {
+        return getLocalMoves(board, this, isForDefending);
     }
 
     @Override
     public List<Move> getValidMoves(final Board board,
-                                    final Piece piece) {
-        return getLocalMoves(board, piece);
+                                    final Piece piece,
+                                    final Boolean isForDefending) {
+        return getLocalMoves(board, piece, isForDefending);
     }
 
     @Override

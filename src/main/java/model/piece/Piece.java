@@ -33,9 +33,9 @@ public abstract class Piece {
 
     public abstract URL getIcon(Boolean isWhite);
 
-    public abstract List<Move> getValidMoves(Board board);
+    public abstract List<Move> getValidMoves(Board board, Boolean isForDefending);
 
-    public abstract List<Move> getValidMoves(Board board, Piece piece);
+    public abstract List<Move> getValidMoves(Board board, Piece piece, Boolean isForDefending);
 
     public abstract PieceType getPieceType();
 

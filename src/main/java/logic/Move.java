@@ -72,7 +72,7 @@ public class Move {
     }
 
     public boolean isAttack(){
-        if (this.board.getAttacks().contains(this)) {
+        if (this.board.getAttacks().contains(this) || this.board.getBoardConfig().get(this.getDestination()) != null) {
             setAttackedPiece(this.board.getBoardConfig().get(this.getDestination()));
             return true;
         } else return false;
@@ -119,4 +119,14 @@ public class Move {
         return this.board;
     }
 
+
+    public boolean canAttackFree(){
+        return this.isAttack()
+                && (board.getCurrentPlayer()
+                .getOpponent()
+                .getValidMoves()
+                .stream()
+                .noneMatch(move1 -> move1.getDestination().equals(this.getDestination()))
+                || this.getAttackedPiece().getPieceValue() >= this.getPiece().getPieceValue());
+    }
 }

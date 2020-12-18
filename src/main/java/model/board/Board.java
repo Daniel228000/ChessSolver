@@ -14,8 +14,8 @@ public class Board {
     private final List<Piece> whitePieces;
     private final List<Piece> blackPieces;
 
-    private final Player whitePlayer;
-    private final Player blackPlayer;
+    private final WhitePlayer whitePlayer;
+    private final BlackPlayer blackPlayer;
     private final Player currentPlayer;
 
     private static final Board STANDARD_BOARD = createStandardBoardImpl();
@@ -27,18 +27,20 @@ public class Board {
         final Collection<Move> whiteStandardMoves = calculateLegalMoves(this.whitePieces);
         final Collection<Move> blackStandardMoves = calculateLegalMoves(this.blackPieces);
         this.whitePlayer = new WhitePlayer(this, whiteStandardMoves, blackStandardMoves);
-        this.blackPlayer = new BlackPlayer(this, blackStandardMoves, whiteStandardMoves);
+        this.blackPlayer = new BlackPlayer(this, whiteStandardMoves, blackStandardMoves);
         this.currentPlayer = builder.nextMoveMaker.choosePlayerByColor(this.whitePlayer, this.blackPlayer);
     }
 
     private Collection<Move> calculateLegalMoves(final Collection<Piece> pieces) {
         return pieces.stream()
-                .flatMap(piece -> piece.getValidMoves(this).stream())
+                .flatMap(piece -> piece.getValidMoves(this, false).stream())
                 .collect(Collectors.toList());
     }
 
     public Collection<Move> getAttacks(){
-          return this.getAllLegalMoves().stream().filter(move -> this.boardConfig.get(move.getDestination()) != null).collect(Collectors.toList());
+          return this.getAllValidMoves().stream().filter(move -> this.boardConfig.get(move.getDestination()) != null &&
+                  this.boardConfig.get(move.getDestination()).getPieceColor() != move.getPiece().getPieceColor()
+          ).collect(Collectors.toList());
     }
 
 
@@ -96,14 +98,14 @@ public class Board {
 
     public Collection<Move> getValidMoves(){
         Collection<Move> validMoves = new ArrayList<>();
-        whitePieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this)));
+        whitePieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this,false)));
         return validMoves;
     }
 
     public Collection<Move> getAllValidMoves(){
         Collection<Move> validMoves = new ArrayList<>();
-        whitePieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this)));
-        blackPieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this)));
+        whitePieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this, false)));
+        blackPieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this, false)));
         return validMoves;
     }
 
@@ -111,11 +113,11 @@ public class Board {
        return color == PieceColor.WHITE ? whitePieces : blackPieces;
    }
 
-    public Player getWhitePlayer() {
+    public WhitePlayer getWhitePlayer() {
         return whitePlayer;
     }
 
-    public Player getBlackPlayer() {
+    public BlackPlayer getBlackPlayer() {
         return blackPlayer;
     }
 

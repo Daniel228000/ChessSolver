@@ -21,9 +21,9 @@ public class King extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(final Board board) {
-        List<Move> moveCandidates = new ArrayList<>(rook.getValidMoves(board,this));
-        moveCandidates.addAll(bishop.getValidMoves(board,this));
+    public List<Move> getValidMoves(final Board board, Boolean isForDefending) {
+        List<Move> moveCandidates = new ArrayList<>(rook.getValidMoves(board,this, isForDefending));
+        moveCandidates.addAll(bishop.getValidMoves(board,this, isForDefending));
         return moveCandidates.stream()
                .filter(candidate -> (
                        Math.abs(candidate.getDestination() - this.getPiecePosition()) <= 9 &&
@@ -32,7 +32,7 @@ public class King extends Piece {
                .collect(Collectors.toList());
     }
     @Override
-    public List<Move> getValidMoves(Board board, Piece piece) {
+    public List<Move> getValidMoves(Board board, Piece piece, Boolean isForDefending) {
         return null;
     }
 

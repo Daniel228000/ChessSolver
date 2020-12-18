@@ -15,7 +15,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(final Board board) {
+    public List<Move> getValidMoves(final Board board, final Boolean isForDefending) {
         List<Move> moveCandidates = new ArrayList<>();
         //for white
         if (this.pieceColor == PieceColor.WHITE)
@@ -48,13 +48,13 @@ public class Pawn extends Piece {
                return !board.getBoardConfig().containsKey(candidate.getDestination());
            } else
              if (board.getBoardConfig().get(candidate.getDestination()) != null) {
-               return !board.getBoardConfig().get(candidate.getDestination()).getPieceColor().equals(this.pieceColor);
+               return !board.getBoardConfig().get(candidate.getDestination()).getPieceColor().equals(this.pieceColor) || isForDefending;
            } else return false;
        }).collect(Collectors.toList());
     }
 
     @Override
-    public List<Move> getValidMoves(Board board, Piece piece) {
+    public List<Move> getValidMoves(Board board, Piece piece, Boolean isForDefending) {
         return null;
     }
 

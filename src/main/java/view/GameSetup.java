@@ -53,8 +53,8 @@ class GameSetup extends JDialog {
         final JButton okButton = new JButton("OK");
 
         okButton.addActionListener(e -> {
-            whitePlayerType = PlayerType.HUMAN;
-            blackPlayerType =  PlayerType.COMPUTER;
+            whitePlayerType = PlayerType.COMPUTER;
+            blackPlayerType =  PlayerType.HUMAN;
             GameSetup.this.setVisible(false);
         });
 
