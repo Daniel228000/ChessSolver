@@ -28,29 +28,85 @@ public class RescueFinder {
         if (piecesNeedToSave != null && !piecesNeedToSave.isEmpty()) {
             Piece piece = piecesNeedToSave.get(0);
             Piece attacker = defenderAttacker.get(piece);
+            List<Move> freeAttackByAttacked = new ArrayList<>();
+            List<Move> freeAttackByAll = new ArrayList<>();
+            List<Move> exchangeAttackByAttacked = new ArrayList<>();
+            List<Move> exchangeAttackByAll = new ArrayList<>();
 
+            //Поиск ходов атакованной фигуры, при которых она атакует незащищенную фигуру противника
+            piece.getValidMoves(board, false)
+                    .stream()
+                    .filter(move -> !isProtectedWithAllies(board, move.getDestination(), player.getOpponent()) &&
+                            move.isAttack() )
+                    .forEach(freeAttackByAttacked::add);
 
-            //Если атакующая фигура не защищена или ее стоиомость больше либо равна стоимости атакуемой фигуры, то мы атакуем фигуру врага, если можем.
-            if (!isPieceProtected(board, player.getOpponent(), attacker) || attacker.getPieceValue() >= piece.getPieceValue()){
-                List<Move> list = piece.getValidMoves(board, false)
-                        .stream()
-                        .filter(move -> move.getDestination() == defenderAttacker.get(piece).getPiecePosition()).collect(Collectors.toList());
-                player.getValidMoves()
-                        .stream()
-                        .filter(move -> move.getDestination() == defenderAttacker.get(piece).getPiecePosition())
-                        .forEach(list::add);
-                if (!list.isEmpty()) {
-                    if (piece.getPieceType() == PieceType.KING) list.sort(Comparator.comparing(move -> move.getPiece().getPieceValue()));
-                    System.out.println("FIGURE " + piece.getPieceType() + " COUNTERATTACKS");
-                    return list.get(0);
-                }
+            //Поиск всех ходов, при которых мы атакуем незащищенную фигуру противника
+            player.getValidMoves()
+                    .stream()
+                    .filter(move -> !isProtectedWithAllies(board, move.getDestination(), player.getOpponent()) &&
+                            move.isAttack() )
+                    .forEach(freeAttackByAll::add);
+
+            //Поиск ходов атакованной фигуры, при которых она атакует защищенную фигуру противника с наибольшей стоиомстью
+            piece.getValidMoves(board, false)
+                    .stream()
+                    .filter(move -> isProtectedWithAllies(board, move.getDestination(), player.getOpponent()) &&
+                            move.isAttack() &&
+                            (move.getAttackedPiece().getPieceValue() >= move.getPiece().getPieceValue() ||
+                                    (isProtectedWithAllies(board, move.getDestination(), player) &&
+                                            move.getPiece().getPieceValue() <= protectingPiece(board, move.getDestination(), player.getOpponent()).getPieceValue()
+                                    )
+                            ) )
+                    .forEach(exchangeAttackByAttacked::add);
+
+            //Поиск ходов, при которых мы атакуем защищенную фигуру противника с наибольшей стоимостью
+            player.getValidMoves()
+                    .stream()
+                    .filter(move -> isProtectedWithAllies(board, move.getDestination(), player.getOpponent()) &&
+                            move.isAttack() &&
+                            move.getAttackedPiece().getPieceValue() >= move.getPiece().getPieceValue())
+                    .forEach(exchangeAttackByAll::add);
+
+            int bestValue = Integer.MIN_VALUE;
+            Move bestMove = null;
+            //Ходы атакованной фигуры, которые могут атаковать незащищенную фигуру противника - самые приоритетные
+            //Ценность такого хода считается как сумма стоимостей убитой фигуры противника и сохраненной фигуры
+            System.out.println(freeAttackByAttacked.size() + "freeAttackByAttacked");
+            if (!freeAttackByAttacked.isEmpty()) {
+                    freeAttackByAttacked.sort(Comparator.comparing(move -> move.getAttackedPiece().getPieceValue()));
+                    bestMove = freeAttackByAttacked.get(0);
             }
+            //Если среди ходов остальных фигур есть ход выгоднее, то выбирается он.
+            //В данном случае такой ход выберется если мы можем атаковать вражеского ферзя другой фигурой, но при этом потерять одну свою фигуру
+            System.out.println(freeAttackByAll.size() + "freeAttackByAll");
+            if (!freeAttackByAll.isEmpty()) {
+                freeAttackByAll.sort(Comparator.comparing(move -> move.getAttackedPiece().getPieceValue()));
+                Move currentMove = freeAttackByAll.get(0);
+                if (currentMove.getAttackedPiece().getPieceValue() == 900 || freeAttackByAttacked.isEmpty()) return currentMove;
+
+
+            }
+            System.out.println(exchangeAttackByAttacked.size() + "exchangeAttacked");
+            if (!exchangeAttackByAttacked.isEmpty()){
+                exchangeAttackByAttacked.sort(Comparator.comparing(move -> move.getAttackedPiece().getPieceValue()));
+                Move currentMove = exchangeAttackByAttacked.get(0);
+                if (currentMove.getAttackedPiece().getPieceValue() == 900 || freeAttackByAll.isEmpty()) return currentMove;
+            }
+            System.out.println(exchangeAttackByAll.size() + "exchangeAttackByAll");
+            if (!exchangeAttackByAll.isEmpty()) {
+                exchangeAttackByAll.sort(Comparator.comparing(move -> move.getAttackedPiece().getPieceValue()));
+                Move currentMove = exchangeAttackByAll.get(0);
+                if (currentMove.getAttackedPiece().getPieceValue() == 900 || exchangeAttackByAttacked.isEmpty()) return currentMove;
+
+            }
+
+            if (bestMove != null) return bestMove;
+
 
             //Если есть пешки, способные закрыть нужную фигуру от врага(при этом сама пешка должна быть под защитой), то делаем ход пешкой.
             //Для короля это правило работает со всеми фигурами, т.е. если есть любая фигура, способная закрыть короля от шаха, она это сделает.
             //positionsBetween - позиции между атакуемой фигурой и атакующей
             List<Integer> positionsBetween = getBetweenPositions(piece, attacker);
-            System.out.println(positionsBetween);
             //Поиск фигур, которые могут спасти атакованную фигуру
             Stream<Piece> stream = player.getActivePieces()
                     .stream()
@@ -63,15 +119,14 @@ public class RescueFinder {
                 stream.forEach(piece1 -> moves.addAll(
                                 piece1.getValidMoves(board, false)
                                         .stream()
-                                        .filter(move -> positionsBetween.contains(move.getDestination())&& isPositionProtected(board, move.getPiece(), move.getDestination()))
+                                        .filter(move -> positionsBetween.contains(move.getDestination()) && (isProtected(board, move.getDestination(), player)))
                                         .collect(Collectors.toList())));
                 moves.sort(Comparator.comparing(move -> move.getPiece().getPieceValue()));
-            System.out.println(moves.size() + "PAWNSIZAKAKA");
-            //Если есть фигура, которая может закрыть нас И (ее стомость меньше либо равна стоиомсти атакующей фигуры
+            //Если есть фигура, которая может закрыть нас И (ее стомость меньше либо равна стоимсти атакующей фигуры
             // ИЛИ стомость спасаемой фигуры больше той, которая может защитить, то ходим этой фигурой (например, чтобы ферзь мог защитить собой короля если у того не будет ходов)
             if (!moves.isEmpty()) {
-                    if (moves.get(0).getPiece().getPieceValue() <= attacker.getPieceValue() ||
-                            (piece.getPieceType() == PieceType.KING && !hasEscapeMoves(board, player, piece))) {
+                    if (moves.get(0).getPiece().getPieceValue() < attacker.getPieceValue() ||
+                            (piece.getPieceType() == PieceType.KING && (!hasEscapeMoves(board, player, piece) || moves.get(0).getPiece().getPieceValue() == attacker.getPieceValue()))) {
                         System.out.println("FIGURE " + piece.getPieceType() + " SAVED BY " + moves.get(0).getPiece().getPieceType());
                         return moves.get(0);
                 }
@@ -81,30 +136,14 @@ public class RescueFinder {
             //Если нет других вариантов, то спасаем атакуемую фигуру, если у нее есть безопасные ходы.
             List<Move> runMoves = piece.getValidMoves(board, false)
                     .stream()
-                    .filter(move -> player.getOpponent()
-                            .getValidMoves()
-                            .stream()
-                            .noneMatch(move1 -> move.getDestination().equals(move1.getDestination()))
+                    .filter(move -> !isProtected(board, move.getDestination(), player.getOpponent()) ||
+                            (isProtected(board, move.getDestination(), player) &&
+                                    move.getPiece().getPieceValue() < protectingPiece(board, move.getDestination(), player.getOpponent()).getPieceValue())
                     ).collect(Collectors.toList());
             if (!runMoves.isEmpty()) {
                 saveMove = runMoves.get(0);
-                int saveValue = saveMove.getPiece().getPieceValue();
                 System.out.println("FIGURE " + piece.getPieceType() + " SAVED");
-            } //else {/////////////////////////////////////////
-              //  List<Move> revengeMoves = new ArrayList<>();
-              //  //Если нет никаких способов спасти фигуру, то проверяем, есть ли фигуры, способные отомстить
-              //  player.getActivePieces()
-              //          .forEach(piece1 -> piece1.getValidMoves(board, true)
-              //                  .stream()
-              //                  .filter(move -> move.getDestination() == piece.getPiecePosition())
-              //                  .forEach(revengeMoves::add));
-              //  revengeMoves.sort(Comparator.comparing(move -> move.getPiece().getPieceValue()));
-              //  if (!revengeMoves.isEmpty()){
-              //      if (!isPieceProtected(board, player.getOpponent(), attacker) || revengeMoves.get(0).getPiece().getPieceValue() <= attacker.getPieceValue()){
-              //          revengeMove = revengeMoves.get(0);
-              //      }
-             //   }
-           // }
+            }
         }
         return saveMove;
     }
@@ -129,7 +168,6 @@ public class RescueFinder {
         if (Math.abs(attacker.getPiecePosition() / 8 - piece.getPiecePosition() / 8) == Math.abs(attacker.getPiecePosition() % 8 - piece.getPiecePosition() % 8)) {
             int difference = Math.abs(attacker.getPiecePosition() - piece.getPiecePosition()) / 8 - 1;
             for (int i = 1; i <= difference; i++) {
-                //if (attacker.getPiecePosition() >  piece.getPiecePosition())
                 if (attacker.getPiecePosition() % 8 > piece.getPiecePosition() % 8)
                 betweenPositions.add(Math.min(attacker.getPiecePosition(), piece.getPiecePosition()) + 7*i);
                 else betweenPositions.add(Math.min(attacker.getPiecePosition(), piece.getPiecePosition()) + 9*i);
@@ -220,6 +258,35 @@ public class RescueFinder {
                 .anyMatch(move -> move.getDestination().equals(position));
     }
 
+    private boolean isProtected(Board board, int position,  Player player){
+                return player.getActivePieces()
+                        .stream()
+                        .anyMatch(piece -> piece
+                                .getValidMoves(board, false)
+                                .stream()
+                                .anyMatch(move -> move.getDestination() == position));
+    }
+
+    private boolean isProtectedWithAllies(Board board, int position,  Player player){
+        return player.getActivePieces()
+                .stream()
+                .anyMatch(piece -> piece
+                        .getValidMoves(board, true)
+                        .stream()
+                        .anyMatch(move -> move.getDestination() == position));
+    }
+
+    private Piece protectingPiece(Board board, int position, Player player){
+        return player.getActivePieces()
+                        .stream()
+                        .filter(piece -> piece
+                                .getValidMoves(board, true)
+                                .stream()
+                                .anyMatch(move -> move.getDestination() == position)
+                        ).sorted(Comparator.comparing(Piece::getPieceValue)).collect(Collectors.toList()).get(0);
+    }
+
+
     private boolean isPieceProtected(Board board, Player player, Piece piece) {
         return player
                 .getActivePieces()
@@ -254,6 +321,24 @@ public class RescueFinder {
 
     public Move getRevengeMove() {
         return revengeMove;
+    }
+
+    public Move getAttackMove() {
+        List<Move> moves = new ArrayList<>();
+        player.getValidMoves()
+                .stream()
+                .filter(move -> move.isAttack() &&
+                        (move.getPiece().getPieceValue() <= move.getAttackedPiece().getPieceValue() ||
+                                !isProtectedWithAllies(board, move.getDestination(), player.getOpponent()))
+                ).forEach(moves::add);
+
+        if (!moves.isEmpty()) {
+            moves.sort(Comparator.comparing(move -> move.getAttackedPiece().getPieceValue()));
+            return moves.get(moves.size() - 1);
+        } else {
+            System.out.println("No attacks available");
+            return null;
+        }
     }
 
 }

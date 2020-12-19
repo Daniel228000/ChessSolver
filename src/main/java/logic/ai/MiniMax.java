@@ -13,7 +13,6 @@ public class MiniMax implements MoveStrategy {
     private Move bestAttackMove = null;
     private Integer bestAttackPreviousPosition = -1;
     private RescueFinder rescueFinder = new RescueFinder();
-    private AttackMoveFinder attackFinder = new AttackMoveFinder();
 
 
     public MiniMax(final int searchDepth) {
@@ -35,31 +34,22 @@ public class MiniMax implements MoveStrategy {
         int previousPosition;
         int j = 0;
 
-
-
-
-
-
         for (final Move move : player.getValidMoves()) {
             int currentPiecesValue = StandardBoardEvaluator.evaluateAttackedPieces(board, player);
-            System.out.println(currentPiecesValue + "evaluation!");
                 rescueFinder.setBoard(board);
                 rescueFinder.setPlayer(player);
-                attackFinder.setBoard(board);
-                attackFinder.setPlayer(player);
                 Move saveMove = rescueFinder.getSaveMove();
-                //Move attackMove = attackFinder.getAttackMove();
-            System.out.println(saveMove + "savemove");
-            System.out.println(rescueFinder.getRevengeMove() + "revenge");
+                Move attackMove = rescueFinder.getAttackMove();
                 if (saveMove != null) {
                     bestMove = saveMove;
                     break;
                 }
-                //else if (attackMove != null){
-                //    System.out.println("FIGURE " + attackMove.getPiece().getPieceType() + " ATTACKED " + attackMove.getAttackedPiece().getPieceType());
-                //    bestMove = attackMove;
-                //    break;
-                //}
+                else if (attackMove != null){
+                    System.out.println("FIGURE " + attackMove.getPiece().getPieceType() + " ATTACKING " + attackMove.getAttackedPiece().getPieceType());
+                    System.out.println(attackMove.getDestination());
+                    bestMove = attackMove;
+                    break;
+                }
 
 
 
@@ -77,7 +67,8 @@ public class MiniMax implements MoveStrategy {
                             j++;
                             highestSeenValue = currentValue;
                             bestMove = move;
-                            if (j >= 12) return bestMove;
+                            System.out.println((StandardBoardEvaluator.evaluateAttackedPieces(board, player) == currentPiecesValue) + "HELOWOEKD");
+                            if (j >= 13) return bestMove;
                         }
 
                     } else if (board.getCurrentPlayer().getType() == PieceColor.BLACK && currentValue < lowestSeenValue) {
@@ -85,7 +76,7 @@ public class MiniMax implements MoveStrategy {
                             j++;
                             lowestSeenValue = currentValue;
                             bestMove = move;
-                            if (j >= 12) return bestMove;
+                            if (j >= 13) return bestMove;
                         }
                     }
                     player.undoMove(move, previousPosition);

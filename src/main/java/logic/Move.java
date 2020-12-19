@@ -72,7 +72,7 @@ public class Move {
     }
 
     public boolean isAttack(){
-        if (this.board.getAttacks().contains(this) || this.board.getBoardConfig().get(this.getDestination()) != null) {
+        if (this.board.getAttacks().contains(this) || this.board.getBoardConfig().get(this.getDestination()) != null && this.getPiece().getPieceColor() != this.board.getBoardConfig().get(this.getDestination()).getPieceColor()) {
             setAttackedPiece(this.board.getBoardConfig().get(this.getDestination()));
             return true;
         } else return false;
