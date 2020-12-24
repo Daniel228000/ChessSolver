@@ -40,6 +40,30 @@ public class Queen extends Piece {
         return 900;
     }
 
+    public int[] getPreferredPositions() {
+        if (this.getPieceColor() == PieceColor.BLACK) {
+            return new int[]{
+                    -20,-10,-10, -5, -5,-10,-10,-20,
+                    -10,  0,  0,  0,  0,  0,  0,-10,
+                    -10,  0,  5,  5,  5,  5,  0,-10,
+                    -5,  0,  5,  5,  5,  5,  0, -5,
+                    0,  0,  5,  5,  5,  5,  0, -5,
+                    -10,  5,  5,  5,  5,  5,  0,-10,
+                    -10,  0,  5,  0,  0,  0,  0,-10,
+                    -20,-10,-10, -5, -5,-10,-10,-20
+            };
+        } else return new int[]{
+                -20,-10,-10, -5, -5,-10,-10,-20,
+                -10,  0,  5,  0,  0,  0,  0,-10,
+                -10,  5,  5,  5,  5,  5,  0,-10,
+                0,  0,  5,  5,  5,  5,  0, -5,
+                0,  0,  5,  5,  5,  5,  0, -5,
+                -10,  0,  5,  5,  5,  5,  0,-10,
+                -10,  0,  0,  0,  0,  0,  0,-10,
+                -20,-10,-10, -5, -5,-10,-10,-20
+        };
+    }
+
     @Override
     public URL getIcon(Boolean isWhite) {
         return isWhite ? this.getClass().getClassLoader().getResource("views/whiteQueen.png") : this.getClass().getClassLoader().getResource("views/blackQueen.png");

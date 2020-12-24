@@ -11,6 +11,16 @@ public enum PieceColor {
         public Player choosePlayerByColor (final WhitePlayer whitePlayer, final BlackPlayer blackPlayer){
             return whitePlayer;
         }
+
+        @Override
+        public boolean isWhite() {
+            return true;
+        }
+
+        @Override
+        public boolean isBlack() {
+            return false;
+        }
     },
 
     BLACK() {
@@ -18,8 +28,21 @@ public enum PieceColor {
         public Player choosePlayerByColor(final WhitePlayer whitePlayer, final BlackPlayer blackPlayer){
             return blackPlayer;
         }
+        @Override
+        public boolean isWhite() {
+            return false;
+        }
+
+        @Override
+        public boolean isBlack() {
+            return true;
+        }
     };
 
     public abstract Player choosePlayerByColor(final WhitePlayer whitePlayer, final BlackPlayer blackPlayer);
+
+    public abstract boolean isWhite();
+
+    public abstract boolean isBlack();
 
 }

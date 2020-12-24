@@ -37,6 +37,8 @@ public abstract class Piece {
 
     public abstract List<Move> getValidMoves(Board board, Piece piece, Boolean isForDefending);
 
+    public abstract List<Move> getValidMovesInSpecificPositions(Board board, Piece forPiece, int position, Boolean isForDefining);
+
     public abstract PieceType getPieceType();
 
     public abstract int getPieceValue();
@@ -45,4 +47,7 @@ public abstract class Piece {
         this.piecePosition = piecePosition;
         return this;
     }
+
+    public abstract int[] getPreferredPositions();
+
 }

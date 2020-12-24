@@ -2,6 +2,7 @@ package model.piece;
 
 import logic.Move;
 import logic.MoveFactory;
+import logic.ai.MoveHelper;
 import model.board.Board;
 import java.net.URL;
 import java.util.*;
@@ -40,13 +41,15 @@ public class Pawn extends Piece {
         }
         return moveCandidates.stream()
                 .filter(candidate -> candidate.getDestination() >= 0 && candidate.getDestination() <= 63  &&
-                                Math.abs(piecePosition % 8 - candidate.getDestination() % 8) <= 1
-
-                        )
-               .filter((candidate) ->{
-           if ((candidate.getDestination() - this.piecePosition) % 8 == 0) {
-               return !board.getBoardConfig().containsKey(candidate.getDestination());
-           } else
+                        Math.abs(piecePosition % 8 - candidate.getDestination() % 8) <= 1 &&
+                        board.getActivePieces(getPieceColor()).stream().noneMatch(piece ->
+                                MoveHelper.getBetweenPositions(candidate.getPiece().getPiecePosition(), candidate.getDestination())
+                                        .contains(piece.getPiecePosition()))
+                )
+                .filter((candidate) -> {
+                    if ((candidate.getDestination() - this.piecePosition) % 8 == 0) {
+                        return !board.getBoardConfig().containsKey(candidate.getDestination());
+                    } else
              if (board.getBoardConfig().get(candidate.getDestination()) != null) {
                return !board.getBoardConfig().get(candidate.getDestination()).getPieceColor().equals(this.pieceColor) || isForDefending;
            } else return false;
@@ -65,6 +68,31 @@ public class Pawn extends Piece {
 
     public int getPieceValue() {
         return 100;
+    }
+
+
+    public int[] getPreferredPositions() {
+        if (this.getPieceColor() == PieceColor.BLACK) {
+            return new int[]{
+                    0,  0,  0,  0,  0,  0,  0,  0,
+                    75, 75, 75, 75, 75, 75, 75, 75,
+                    25, 25, 29, 29, 29, 29, 25, 25,
+                    5,  5, 10, 55, 55, 10,  5,  5,
+                    0,  0,  0, 20, 20,  0,  0,  0,
+                    5, -5,-10,  0,  0,-10, -5,  5,
+                    5, 10, 10,-20,-20, 10, 10,  5,
+                    0,  0,  0,  0,  0,  0,  0,  0
+            };
+        } else return new int[]{
+                0,  0,  0,  0,  0,  0,  0,  0,
+                5, 10, 10,-20,-20, 10, 10,  5,
+                5, -5,-10,  0,  0,-10, -5,  5,
+                0,  0,  0, 20, 20,  0,  0,  0,
+                5,  5, 10, 55, 55, 10,  5,  5,
+                25, 25, 29, 29, 29, 29, 25, 25,
+                75, 75, 75, 75, 75, 75, 75, 75,
+                0,  0,  0,  0,  0,  0,  0,  0
+        };
     }
 
     @Override

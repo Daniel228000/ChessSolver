@@ -83,6 +83,30 @@ public class Rook extends Piece {
         return 500;
     }
 
+    public int[] getPreferredPositions() {
+        if (this.getPieceColor() == PieceColor.BLACK) {
+            return new int[]{
+                    0,  0,  0,  0,  0,  0,  0,  0,
+                    5, 20, 20, 20, 20, 20, 20,  5,
+                    -5,  0,  0,  0,  0,  0,  0, -5,
+                    -5,  0,  0,  0,  0,  0,  0, -5,
+                    -5,  0,  0,  0,  0,  0,  0, -5,
+                    -5,  0,  0,  0,  0,  0,  0, -5,
+                    -5,  0,  0,  0,  0,  0,  0, -5,
+                    0,  0,  0,  5,  5,  0,  0,  0
+            };
+        } else return new int[]{
+                0,  0,  0,  5,  5,  0,  0,  0,
+                -5,  0,  0,  0,  0,  0,  0, -5,
+                -5,  0,  0,  0,  0,  0,  0, -5,
+                -5,  0,  0,  0,  0,  0,  0, -5,
+                -5,  0,  0,  0,  0,  0,  0, -5,
+                -5,  0,  0,  0,  0,  0,  0, -5,
+                5, 20, 20, 20, 20, 20, 20,  5,
+                0,  0,  0,  0,  0,  0,  0,  0,
+        };
+    }
+
     @Override
     public URL getIcon(Boolean isWhite) {
         return isWhite ? this.getClass().getClassLoader().getResource("views/whiteRook.png") : this.getClass().getClassLoader().getResource("views/blackRook.png");

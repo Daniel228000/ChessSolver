@@ -22,9 +22,13 @@ public final class StandardBoardEvaluator implements BoardEvaluator {
     }
 
     public static int evaluateAttackedPieces(Board board, Player player){
-        return player.getOpponent().getValidMoves()
+        return player.getActivePieces()
                 .stream()
-                .filter(Move::isAttack).mapToInt(move -> move.getAttackedPiece().getPieceValue()).sum();
+                .filter(piece ->
+                                player.getOpponent()
+                                    .getValidMoves()
+                                    .stream().anyMatch(move1 -> move1.isAttack() && move1.getAttackedPiece() == piece))
+                .mapToInt(Piece::getPieceValue).sum();
     }
 
     private int scorePlayer(final Board board,

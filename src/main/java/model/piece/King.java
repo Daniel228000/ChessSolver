@@ -36,6 +36,11 @@ public class King extends Piece {
         return null;
     }
 
+    @Override
+    public List<Move> getValidMovesInSpecificPositions(Board board, final Piece forPiece, int position, Boolean isForDefining) {
+        return getLocalMoves(board, forPiece, position, false);
+    }
+
     public int getPieceValue() {
         return 10000 ;
     }
@@ -43,6 +48,40 @@ public class King extends Piece {
     public PieceType getPieceType() {
         return PieceType.KING;
     }
+
+    public List<Integer> getNearPositions (final Board board) {
+        List<Integer> nearPositions = new ArrayList<>();
+        getValidMoves(board, true)
+                .forEach(move -> nearPositions.add(move.getDestination()));
+        return nearPositions;
+    }
+
+    @Override
+    public int[] getPreferredPositions() {
+        if (this.getPieceColor() == PieceColor.BLACK) {
+            return new int[]{
+                    -30,-40,-40,-50,-50,-40,-40,-30,
+                    -30,-40,-40,-50,-50,-40,-40,-30,
+                    -30,-40,-40,-50,-50,-40,-40,-30,
+                    -30,-40,-40,-50,-50,-40,-40,-30,
+                    -20,-30,-30,-40,-40,-30,-30,-20,
+                    -10,-20,-20,-20,-20,-20,-20,-10,
+                    20, 20,  0,  0,  0,  0, 20, 20,
+                    20, 30, 10,  0,  0, 10, 30, 20
+            };
+        } else return new int[]{
+                20, 30, 10,  0,  0, 10, 30, 20,
+                20, 20,  0,  0,  0,  0, 20, 20,
+                -10,-20,-20,-20,-20,-20,-20,-10,
+                -20,-30,-30,-40,-40,-30,-30,-20,
+                -30,-40,-40,-50,-50,-40,-40,-30,
+                -30,-40,-40,-50,-50,-40,-40,-30,
+                -30,-40,-40,-50,-50,-40,-40,-30,
+                -30,-40,-40,-50,-50,-40,-40,-30
+        };
+    }
+
+
 
     @Override
     public URL getIcon(Boolean isWhite) {
