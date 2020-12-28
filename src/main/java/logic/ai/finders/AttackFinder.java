@@ -1,4 +1,4 @@
-package logic.ai;
+package logic.ai.finders;
 
 import logic.Move;
 import logic.Player;
@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 public class AttackFinder extends MoveFinder {
     private Board board;
     private Player player;
-    private King king;
 
     @Override
     public Move getBestMove() {
@@ -24,7 +23,7 @@ public class AttackFinder extends MoveFinder {
 
         if (!moves.isEmpty()) {
             moves.sort(Comparator.comparing(move -> move.getAttackedPiece().getPieceValue()));
-            return moves.get(moves.size() - 1);
+            return MoveHelper.getBestAttackMove(board, player, moves);
         } else {
             System.out.println("No attacks available");
             return null;
@@ -34,8 +33,6 @@ public class AttackFinder extends MoveFinder {
     public void prepareFinder(Board board, Player player, King king){
         this.board = board;
         this.player = player;
-        this.king = king;
     }
-
 
 }

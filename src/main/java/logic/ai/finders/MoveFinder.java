@@ -1,4 +1,4 @@
-package logic.ai;
+package logic.ai.finders;
 
 
 import logic.Move;

@@ -2,6 +2,7 @@ package model.piece;
 
 import logic.Move;
 import model.board.Board;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +21,14 @@ public class Queen extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(final Board board, final Boolean isForDefending) {
-        List<Move> moveCandidates = new ArrayList<>(bishop.getValidMoves(board,this, isForDefending));
-        moveCandidates.addAll(rook.getValidMoves(board,this, isForDefending));
+    public List<Move> getValidMoves(final Board board, final int position, final Boolean isForDefending) {
+        List<Move> moveCandidates = new ArrayList<>(bishop.getValidMoves(board,this, position, isForDefending));
+        moveCandidates.addAll(rook.getValidMoves(board,this, position, isForDefending));
         return moveCandidates;
     }
 
     @Override
-    public List<Move> getValidMoves(Board board, Piece piece, Boolean isForDefending) {
+    public List<Move> getValidMoves(Board board, Piece piece, int position, Boolean isForDefending) {
         return null;
     }
 
@@ -40,6 +41,7 @@ public class Queen extends Piece {
         return 900;
     }
 
+    @Override
     public int[] getPreferredPositions() {
         if (this.getPieceColor() == PieceColor.BLACK) {
             return new int[]{

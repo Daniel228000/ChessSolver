@@ -3,26 +3,23 @@ package logic.ai;
 import logic.Move;
 import logic.MoveTransition;
 import logic.Player;
+import logic.ai.finders.*;
 import model.board.Board;
 import model.piece.King;
 import model.piece.PieceType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MiniMax implements MoveStrategy {
     private final BoardEvaluator boardEvaluator;
     private final int searchDepth;
-    private Integer bestAttackMoveValue = Integer.MIN_VALUE;
-    private Move bestAttackMove = null;
-    private MoveFinder safetyAnalyzer = new KingSafetyAnalyzer();
-    private MoveFinder rescueFinder = new RescueFinder();
-    private MoveFinder attackFinder = new RescueFinder();
-    private int counter = 0;
-
+    private final MoveFinder safetyAnalyzer = new KingSafetyAnalyzer();
+    private final MoveFinder rescueFinder = new RescueFinder();
+    private final MoveFinder attackFinder = new AttackFinder();
+    private final MoveFinder checkOrNextAttackFinder = new CheckOrNextAttackFinder();
+    private int previousBestMovePosition = -1;
 
     public MiniMax(final int searchDepth) {
         this.boardEvaluator = new StandardBoardEvaluator();
@@ -46,8 +43,9 @@ public class MiniMax implements MoveStrategy {
             King king = (King) player.getActivePieces().stream().filter(piece -> piece.getPieceType() == PieceType.KING).collect(Collectors.toList()).get(0);
             Move foundMove = selectBestMove(Arrays.asList(safetyAnalyzer, rescueFinder, attackFinder), board, player, king);
             if (foundMove != null) {
-                bestMove = foundMove;
-                break;
+                return foundMove;
+               //bestMove = foundMove;
+               //break;
             }
 
             previousPosition = move.getPiece().getPiecePosition();
@@ -60,11 +58,14 @@ public class MiniMax implements MoveStrategy {
                         highestSeenValue = currentValue;
                         bestMove = move;
                     }
-                    System.out.println((StandardBoardEvaluator.evaluateAttackedPieces(board, player) == currentPiecesValue) + "HELOWOEKD");
-                    if (j >= countMoves / 3 &&
-                            (PrefferedPositions.goesToBetterPosition(move) &&
-                            StandardBoardEvaluator.evaluateAttackedPieces(board, player) <= currentPiecesValue))
+                    if (j >= countMoves / 2 &&
+                            (MoveHelper.goesToBetterPosition(move, previousPosition) &&
+                                    StandardBoardEvaluator.evaluateAttackedPieces(moveTransition.getFromBoard(), player) -
+                                            StandardBoardEvaluator.evaluateAttackedPieces(moveTransition.getToBoard(), player) < 201) &&
+                    move.getDestination() != previousBestMovePosition){
+                        previousBestMovePosition = bestMove.getPiece().getPiecePosition();
                         return bestMove;
+                    }
                 }
                 player.undoMove(move, previousPosition);
             }
@@ -81,7 +82,6 @@ public class MiniMax implements MoveStrategy {
                    final int highest,
                    final int lowest) {
         if (depth == 0 || isEndGame(board)){
-            counter += 3;
             return this.boardEvaluator.evaluate(board, depth);
         }
         int currentLowest = lowest;
@@ -109,7 +109,6 @@ public class MiniMax implements MoveStrategy {
                    final int highest,
                    final int lowest) {
         if (depth == 0 || isEndGame(board)){
-            counter += 3;
             return this.boardEvaluator.evaluate(board, depth);
         }
         int currentHighest = highest;

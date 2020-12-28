@@ -1,19 +1,17 @@
 package model.board;
 
-import logic.*;
+import logic.BlackPlayer;
+import logic.Move;
+import logic.Player;
+import logic.WhitePlayer;
 import model.piece.*;
-
-
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Board {
     private final Map<Integer, Piece> boardConfig;
-
     private final List<Piece> whitePieces;
     private final List<Piece> blackPieces;
-
     private final WhitePlayer whitePlayer;
     private final BlackPlayer blackPlayer;
     private final Player currentPlayer;
@@ -21,7 +19,7 @@ public class Board {
     private static final Board STANDARD_BOARD = createStandardBoardImpl();
 
     private Board(final Builder builder) {
-        this.boardConfig =builder.boardConfig;
+        this.boardConfig = builder.boardConfig;
         this.whitePieces = calculateActivePieces(builder, PieceColor.WHITE);
         this.blackPieces = calculateActivePieces(builder, PieceColor.BLACK);
         final Collection<Move> whiteStandardMoves = calculateLegalMoves(this.whitePieces);
@@ -33,7 +31,7 @@ public class Board {
 
     private Collection<Move> calculateLegalMoves(final Collection<Piece> pieces) {
         return pieces.stream()
-                .flatMap(piece -> piece.getValidMoves(this, false).stream())
+                .flatMap(piece -> piece.getValidMoves(this,-1, false).stream())
                 .collect(Collectors.toList());
     }
 
@@ -47,7 +45,6 @@ public class Board {
     public static Board createStandardBoard () {
         return STANDARD_BOARD;
     }
-
 
     public static Board createStandardBoardImpl(){
 
@@ -91,21 +88,16 @@ public class Board {
                 .collect(Collectors.toList());
     }
 
-    public Collection<Move> getAllLegalMoves() {
-        return Stream.concat(this.whitePlayer.getValidMoves().stream(),
-                this.blackPlayer.getValidMoves().stream()).collect(Collectors.toList());
-    }
-
     public Collection<Move> getValidMoves(){
         Collection<Move> validMoves = new ArrayList<>();
-        whitePieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this,false)));
+        whitePieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this,-1,false)));
         return validMoves;
     }
 
     public Collection<Move> getAllValidMoves(){
         Collection<Move> validMoves = new ArrayList<>();
-        whitePieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this, false)));
-        blackPieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this, false)));
+        whitePieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this,-1, false)));
+        blackPieces.forEach(piece -> validMoves.addAll(piece.getValidMoves(this,-1, false)));
         return validMoves;
     }
 

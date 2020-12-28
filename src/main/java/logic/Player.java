@@ -1,9 +1,14 @@
 package logic;
 
 import model.board.Board;
-import model.piece.*;
+import model.piece.King;
+import model.piece.Piece;
+import model.piece.PieceColor;
+import model.piece.PieceType;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class Player {

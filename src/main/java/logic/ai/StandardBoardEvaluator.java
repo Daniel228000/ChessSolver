@@ -4,6 +4,7 @@ import logic.Move;
 import logic.Player;
 import model.board.Board;
 import model.piece.Piece;
+import model.piece.PieceColor;
 
 public final class StandardBoardEvaluator implements BoardEvaluator {
     public static final int CHECK_BONUS = 50;
@@ -22,7 +23,7 @@ public final class StandardBoardEvaluator implements BoardEvaluator {
     }
 
     public static int evaluateAttackedPieces(Board board, Player player){
-        return player.getActivePieces()
+        return board.getActivePieces(PieceColor.WHITE)
                 .stream()
                 .filter(piece ->
                                 player.getOpponent()

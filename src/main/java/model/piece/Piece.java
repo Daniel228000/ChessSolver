@@ -2,12 +2,12 @@ package model.piece;
 
 import logic.Move;
 import model.board.Board;
+
 import java.net.URL;
 import java.util.List;
 
-
 public abstract class Piece {
-    protected PieceColor pieceColor;
+    protected final PieceColor pieceColor;
     protected Integer piecePosition;
     protected Boolean isFirstMove = true;
 
@@ -33,11 +33,9 @@ public abstract class Piece {
 
     public abstract URL getIcon(Boolean isWhite);
 
-    public abstract List<Move> getValidMoves(Board board, Boolean isForDefending);
+    public abstract List<Move>  getValidMoves(Board board, int position, Boolean isForDefending);
 
-    public abstract List<Move> getValidMoves(Board board, Piece piece, Boolean isForDefending);
-
-    public abstract List<Move> getValidMovesInSpecificPositions(Board board, Piece forPiece, int position, Boolean isForDefining);
+    public abstract List<Move> getValidMoves(Board board, Piece piece, int position, Boolean isForDefending);
 
     public abstract PieceType getPieceType();
 

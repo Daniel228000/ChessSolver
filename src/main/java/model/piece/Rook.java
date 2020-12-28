@@ -5,7 +5,8 @@ import logic.MoveFactory;
 import model.board.Board;
 
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Rook extends Piece {
     public Rook(final PieceColor pieceColor,
@@ -13,12 +14,12 @@ public class Rook extends Piece {
         super(pieceColor,  piecePosition);
     }
 
-    private List<Move> getLocalMoves(Board board, Piece piece, Boolean isForDefending){
+    private List<Move> getLocalMoves(Board board, Piece piece, int position, Boolean isForDefending){
         List<Move> moveCandidates = new ArrayList<>();
-        getColumnCandidates(board, moveCandidates, isForDefending, piece,-1);
-        getColumnCandidates(board, moveCandidates, isForDefending,  piece,1);
-        getRowCandidates(board, moveCandidates, isForDefending,  piece,-1);
-        getRowCandidates(board, moveCandidates, isForDefending,  piece,1);
+        getColumnCandidates(board, moveCandidates, isForDefending, piece, position, -1);
+        getColumnCandidates(board, moveCandidates, isForDefending,  piece, position, 1);
+        getRowCandidates(board, moveCandidates, isForDefending,  piece, position, -1);
+        getRowCandidates(board, moveCandidates, isForDefending,  piece, position, 1);
 
         return moveCandidates;
 
@@ -29,9 +30,11 @@ public class Rook extends Piece {
             final List<Move> moveCandidates,
             final Boolean isForDefending,
             final Piece piece,
+            final int specificPosition,
             final int offset) {
-        int position = piece.getPiecePosition() + offset * 8;
-        while (position >= 0 && position <= 63 && piece.piecePosition % 8 == position % 8) {
+        int currentPosition = specificPosition != -1 ? specificPosition : piece.getPiecePosition();
+        int position = currentPosition + offset * 8;
+        while (position >= 0 && position <= 63 && currentPosition % 8 == position % 8) {
             if (board.getBoardConfig().get(position) != null) {
                 if (!board.getBoardConfig().get(position).getPieceColor().equals(piece.getPieceColor()) || isForDefending) {
                     moveCandidates.add(MoveFactory.build(board, piece, position));
@@ -47,9 +50,11 @@ public class Rook extends Piece {
             final List<Move> moveCandidates,
             final Boolean isForDefending,
             final Piece piece,
+            final int specificPosition,
             final int offset) {
-        int position = piece.getPiecePosition() + offset;
-        while (position >= 0 && position <= 63 && (piece.piecePosition / 8 - position / 8) == 0){
+        int currentPosition = specificPosition != -1 ? specificPosition : piece.getPiecePosition();
+        int position = currentPosition + offset;
+        while (position >= 0 && position <= 63 && (currentPosition / 8 - position / 8) == 0){
             if (board.getBoardConfig().get(position) != null){
                 if (!board.getBoardConfig().get(position).getPieceColor().equals(piece.getPieceColor()) || isForDefending){
                     moveCandidates.add(MoveFactory.build(board, piece, position));
@@ -62,15 +67,16 @@ public class Rook extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(final Board board, final Boolean isForDefending) {
-        return getLocalMoves(board, this, isForDefending);
+    public List<Move> getValidMoves(final Board board, final int position, final Boolean isForDefending) {
+        return getLocalMoves(board, this, position, isForDefending);
     }
 
     @Override
     public List<Move> getValidMoves(final Board board,
                                     final Piece piece,
+                                    final int position,
                                     final Boolean isForDefending) {
-        return getLocalMoves(board, piece, isForDefending);
+        return getLocalMoves(board, piece, position,  isForDefending);
     }
 
     @Override
@@ -83,8 +89,9 @@ public class Rook extends Piece {
         return 500;
     }
 
+    @Override
     public int[] getPreferredPositions() {
-        if (this.getPieceColor() == PieceColor.BLACK) {
+        if (this.getPieceColor() == PieceColor.WHITE) {
             return new int[]{
                     0,  0,  0,  0,  0,  0,  0,  0,
                     5, 20, 20, 20, 20, 20, 20,  5,

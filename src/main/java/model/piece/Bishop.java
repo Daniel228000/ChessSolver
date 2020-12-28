@@ -3,6 +3,7 @@ package model.piece;
 import logic.Move;
 import logic.MoveFactory;
 import model.board.Board;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class Bishop extends Piece {
             final int rowOffset,
             final int columnOffset) {
         int currentPosition = specificPosition != -1 ? specificPosition : piece.getPiecePosition();
-        int position = piece.getPiecePosition() + rowOffset * 8 + columnOffset;
+        int position = currentPosition + rowOffset * 8 + columnOffset;
         while (position >= 0 && position <= 63 && Math.abs(currentPosition / 8 - position / 8) == Math.abs(currentPosition % 8 - position  % 8)) {
             if (board.getBoardConfig().get(position) != null){
                 if (!board.getBoardConfig().get(position).getPieceColor().equals(piece.getPieceColor()) || isForDefending) {
@@ -57,30 +58,25 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(final Board board, Boolean isForDefending) {
-        return getLocalMoves(board, this, -1, isForDefending);
+    public List<Move> getValidMoves(final Board board, int position, Boolean isForDefending) {
+        return getLocalMoves(board, this, position, isForDefending);
     }
 
     @Override
     public List<Move> getValidMoves(final Board board,
                                     final Piece forPiece,
+                                    final int position,
                                     final Boolean isForDefending
                                     ) {
-        return getLocalMoves(board, forPiece, - 1, isForDefending);
+        return getLocalMoves(board, forPiece, position, isForDefending);
     }
-
-    @Override
-    public List<Move> getValidMovesInSpecificPositions(Board board, final Piece forPiece, int position, Boolean isForDefining) {
-        return getLocalMoves(board, forPiece, position, false);
-    }
-
     public int getPieceValue() {
         return 300;
     }
 
     @Override
     public int[] getPreferredPositions() {
-        if (this.getPieceColor() == PieceColor.BLACK) {
+        if (this.getPieceColor() == PieceColor.WHITE) {
             return new int[]{
                     -20,-10,-10,-10,-10,-10,-10,-20,
                     -10,  0,  0,  0,  0,  0,  0,-10,
