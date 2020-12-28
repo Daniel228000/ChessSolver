@@ -2,12 +2,10 @@ package view;
 
 import logic.Player;
 import model.piece.PieceColor;
+import view.Table.PlayerType;
 
 import javax.swing.*;
-import view.Table.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 class GameSetup extends JDialog {
 
@@ -23,31 +21,24 @@ class GameSetup extends JDialog {
         super(frame, modal);
         final JPanel myPanel = new JPanel(new GridLayout(0, 1));
         final JRadioButton whiteHumanButton = new JRadioButton(HUMAN_TEXT);
-        //final JRadioButton whiteComputerButton = new JRadioButton(COMPUTER_TEXT);
-        //final JRadioButton blackHumanButton = new JRadioButton(HUMAN_TEXT);
         final JRadioButton blackComputerButton = new JRadioButton(COMPUTER_TEXT);
         whiteHumanButton.setActionCommand(HUMAN_TEXT);
         final ButtonGroup whiteGroup = new ButtonGroup();
         whiteGroup.add(whiteHumanButton);
-        //whiteGroup.add(whiteComputerButton);
         whiteHumanButton.setSelected(true);
 
         final ButtonGroup blackGroup = new ButtonGroup();
-        //blackGroup.add(blackHumanButton);
         blackGroup.add(blackComputerButton);
         blackComputerButton.setSelected(true);
-        //blackHumanButton.setSelected(true);
 
         getContentPane().add(myPanel);
         myPanel.add(new JLabel("White"));
         myPanel.add(whiteHumanButton);
-        //myPanel.add(whiteComputerButton);
         myPanel.add(new JLabel("Black"));
-        //myPanel.add(blackHumanButton);
         myPanel.add(blackComputerButton);
 
         myPanel.add(new JLabel("Search"));
-        this.searchDepthSpinner = addLabeledSpinner(myPanel, "Search Depth", new SpinnerNumberModel(5, 0, Integer.MAX_VALUE, 1));
+        this.searchDepthSpinner = addLabeledSpinner(myPanel, "Search Depth", new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));
 
         final JButton cancelButton = new JButton("Cancel");
         final JButton okButton = new JButton("OK");

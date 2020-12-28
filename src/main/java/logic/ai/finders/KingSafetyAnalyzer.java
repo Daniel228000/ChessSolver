@@ -1,4 +1,4 @@
-package logic.ai;
+package logic.ai.finders;
 
 import logic.Move;
 import logic.Player;
@@ -10,18 +10,10 @@ import model.piece.PieceType;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class KingSafetyAnalyzer extends MoveFinder{
+public class KingSafetyAnalyzer extends MoveFinder {
     private King king;
     private Board board;
     private Player player;
-
-    public KingSafetyAnalyzer() {
-
-    }
-
-    public void setKing(King king) {
-        this.king = king;
-    }
 
     public void prepareFinder(Board board, Player player, King king){
         this.board = board;
@@ -29,7 +21,7 @@ public class KingSafetyAnalyzer extends MoveFinder{
         this.king = king;
     }
 
-    public Integer attackedPositions(King king) {
+    public Integer attackedPositions() {
         List<Integer> attackedPositions = this.king.getNearPositions(board).stream()
                 .filter(position -> player.getOpponent()
                                 .getValidMoves()
@@ -42,7 +34,7 @@ public class KingSafetyAnalyzer extends MoveFinder{
     public List<Piece> attackingPieces(Integer position){
       return player.getOpponent().getActivePieces()
               .stream()
-              .filter(piece -> piece.getValidMoves(board, false)
+              .filter(piece -> piece.getValidMoves(board,-1, false)
                       .stream()
                       .anyMatch(move -> move.getDestination().equals(position))
               ).collect(Collectors.toList());
@@ -51,7 +43,7 @@ public class KingSafetyAnalyzer extends MoveFinder{
 
     @Override
     public Move getBestMove(){
-        List<Piece> attackers = attackingPieces(attackedPositions(king));
+        List<Piece> attackers = attackingPieces(attackedPositions());
         List<Integer> betweenPositions = new ArrayList<>();
         for (Piece attacker : attackers) {
             betweenPositions.addAll(MoveHelper.getBetweenPositions(king, attacker));

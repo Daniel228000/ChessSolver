@@ -19,8 +19,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.ExecutionException;
 
 import static javax.swing.JFrame.setDefaultLookAndFeelDecorated;
@@ -28,7 +30,6 @@ import static javax.swing.SwingUtilities.*;
 
 public class Table extends Observable {
 
-    private final JFrame gameFrame;
     private final BoardPanel boardPanel;
     public Board board;
 
@@ -49,24 +50,24 @@ public class Table extends Observable {
     private static final Table INSTANCE = new Table();
 
     public Table(){
-        this.gameFrame = new JFrame("chESS");
+        JFrame gameFrame = new JFrame("chESS");
         final JMenuBar tableMenuBar = new JMenuBar();
         populateMenuBar(tableMenuBar);
-        this.gameFrame.setJMenuBar(tableMenuBar);
-        this.gameFrame.setLayout(new BorderLayout());
+        gameFrame.setJMenuBar(tableMenuBar);
+        gameFrame.setLayout(new BorderLayout());
         this.board = Board.createStandardBoard();
         this.boardPanel = new BoardPanel();
         this.addObserver(new TableGameAIWatcher());
-        this.gameSetup = new GameSetup(this.gameFrame, true);
-        this.gameFrame.add(this.boardPanel, BorderLayout.CENTER);
+        this.gameSetup = new GameSetup(gameFrame, true);
+        gameFrame.add(this.boardPanel, BorderLayout.CENTER);
 
         setDefaultLookAndFeelDecorated(true);
-        this.gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.gameFrame.setSize(OUTER_FRAME_DIMENSION);
-        this.gameFrame.setVisible(true);
+        gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        gameFrame.setSize(OUTER_FRAME_DIMENSION);
+        gameFrame.setVisible(true);
 
 
-        this.gameFrame.setVisible(true);
+        gameFrame.setVisible(true);
 
     }
 
@@ -176,9 +177,7 @@ public class Table extends Observable {
         protected Move doInBackground() throws Exception{
             final MoveStrategy miniMax = new MiniMax(Table.get().getGameSetup().getSearchDepth());
 
-            final Move bestMove = miniMax.execute(Table.get().getGameBoard());
-
-            return bestMove;
+            return miniMax.execute(Table.get().getGameBoard());
         }
 
         @Override

@@ -2,10 +2,12 @@ package model.piece;
 
 import logic.Move;
 import logic.MoveFactory;
-import logic.ai.MoveHelper;
+import logic.ai.finders.MoveHelper;
 import model.board.Board;
+
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Pawn extends Piece {
@@ -16,28 +18,29 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(final Board board, final Boolean isForDefending) {
+    public List<Move> getValidMoves(final Board board, final int position, final Boolean isForDefending) {
         List<Move> moveCandidates = new ArrayList<>();
+        int currentPosition = position != -1 ? position : this.getPiecePosition();
         //for white
         if (this.pieceColor == PieceColor.WHITE)
-            moveCandidates.add(MoveFactory.build(board, this, this.getPiecePosition() - 8));
+            moveCandidates.add(MoveFactory.build(board, this, currentPosition - 8));
         else
             //for black
-            moveCandidates.add(MoveFactory.build(board, this, this.getPiecePosition() + 8));
+            moveCandidates.add(MoveFactory.build(board, this, currentPosition + 8));
         if (this.isFirstMove) {
             if (this.pieceColor == PieceColor.WHITE)
                 //for white
-            moveCandidates.add(MoveFactory.build(board,this, this.getPiecePosition() - 16));
+            moveCandidates.add(MoveFactory.build(board,this, currentPosition - 16));
             else
             //for black
-            moveCandidates.add(MoveFactory.build(board,this, this.getPiecePosition() + 16));
+            moveCandidates.add(MoveFactory.build(board,this, currentPosition + 16));
         }
         if (this.pieceColor == PieceColor.WHITE) {
-            moveCandidates.add(MoveFactory.build(board,this, this.getPiecePosition() - 9));
-            moveCandidates.add(MoveFactory.build(board,this, this.getPiecePosition() - 7));
+            moveCandidates.add(MoveFactory.build(board,this, currentPosition - 9));
+            moveCandidates.add(MoveFactory.build(board,this, currentPosition - 7));
         } else {
-            moveCandidates.add(MoveFactory.build(board,this, this.getPiecePosition() + 7));
-            moveCandidates.add(MoveFactory.build(board,this, this.getPiecePosition() + 9));
+            moveCandidates.add(MoveFactory.build(board,this, currentPosition + 7));
+            moveCandidates.add(MoveFactory.build(board,this, currentPosition + 9));
         }
         return moveCandidates.stream()
                 .filter(candidate -> candidate.getDestination() >= 0 && candidate.getDestination() <= 63  &&
@@ -57,7 +60,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(Board board, Piece piece, Boolean isForDefending) {
+    public List<Move> getValidMoves(Board board, Piece piece, int position, Boolean isForDefending) {
         return null;
     }
 
@@ -71,8 +74,9 @@ public class Pawn extends Piece {
     }
 
 
+    @Override
     public int[] getPreferredPositions() {
-        if (this.getPieceColor() == PieceColor.BLACK) {
+        if (this.getPieceColor() == PieceColor.WHITE) {
             return new int[]{
                     0,  0,  0,  0,  0,  0,  0,  0,
                     75, 75, 75, 75, 75, 75, 75, 75,

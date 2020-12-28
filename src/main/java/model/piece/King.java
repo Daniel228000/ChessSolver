@@ -2,6 +2,7 @@ package model.piece;
 
 import logic.Move;
 import model.board.Board;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +22,9 @@ public class King extends Piece {
     }
 
     @Override
-    public List<Move> getValidMoves(final Board board, Boolean isForDefending) {
-        List<Move> moveCandidates = new ArrayList<>(rook.getValidMoves(board,this, isForDefending));
-        moveCandidates.addAll(bishop.getValidMoves(board,this, isForDefending));
+    public List<Move> getValidMoves(final Board board, final int position, Boolean isForDefending) {
+        List<Move> moveCandidates = new ArrayList<>(rook.getValidMoves(board,this, position, isForDefending));
+        moveCandidates.addAll(bishop.getValidMoves(board,this, position, isForDefending));
         return moveCandidates.stream()
                .filter(candidate -> (
                        Math.abs(candidate.getDestination() - this.getPiecePosition()) <= 9 &&
@@ -32,13 +33,8 @@ public class King extends Piece {
                .collect(Collectors.toList());
     }
     @Override
-    public List<Move> getValidMoves(Board board, Piece piece, Boolean isForDefending) {
+    public List<Move> getValidMoves(Board board, Piece piece, int position, Boolean isForDefending) {
         return null;
-    }
-
-    @Override
-    public List<Move> getValidMovesInSpecificPositions(Board board, final Piece forPiece, int position, Boolean isForDefining) {
-        return getLocalMoves(board, forPiece, position, false);
     }
 
     public int getPieceValue() {
@@ -51,14 +47,14 @@ public class King extends Piece {
 
     public List<Integer> getNearPositions (final Board board) {
         List<Integer> nearPositions = new ArrayList<>();
-        getValidMoves(board, true)
+        getValidMoves(board, -1, true)
                 .forEach(move -> nearPositions.add(move.getDestination()));
         return nearPositions;
     }
 
     @Override
     public int[] getPreferredPositions() {
-        if (this.getPieceColor() == PieceColor.BLACK) {
+        if (this.getPieceColor() == PieceColor.WHITE) {
             return new int[]{
                     -30,-40,-40,-50,-50,-40,-40,-30,
                     -30,-40,-40,-50,-50,-40,-40,-30,

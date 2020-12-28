@@ -1,16 +1,16 @@
-package logic.ai;
+package logic.ai.finders;
 
 import logic.Move;
 import logic.Player;
+import lombok.experimental.UtilityClass;
 import model.board.Board;
 import model.piece.Piece;
-import org.reflections.Reflections;
+import model.piece.PieceType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@UtilityClass
 public class MoveHelper {
 
     /**
@@ -81,7 +81,7 @@ public class MoveHelper {
 
 
     public static boolean isPositionProtected(Board board, Piece piece, Integer position){
-        return piece.getValidMoves(board,false)
+        return piece.getValidMoves(board,-1,false)
                 .stream()
                 .anyMatch(move -> move.getDestination().equals(position));
     }
@@ -91,7 +91,7 @@ public class MoveHelper {
         return player.getActivePieces()
                 .stream()
                 .anyMatch(piece -> piece
-                        .getValidMoves(board, false)
+                        .getValidMoves(board,-1, false)
                         .stream()
                         .anyMatch(move -> move.getDestination() == position));
     }
@@ -102,7 +102,7 @@ public class MoveHelper {
                 .stream()
                 .filter(piece -> !piece.equals(pieceOwner))
                 .anyMatch(piece -> piece
-                        .getValidMoves(board, false)
+                        .getValidMoves(board,-1, false)
                         .stream()
                         .anyMatch(move -> move.getDestination() == position));
     }
@@ -114,7 +114,7 @@ public class MoveHelper {
         return player.getActivePieces()
                 .stream()
                 .anyMatch(piece -> piece
-                        .getValidMoves(board, true)
+                        .getValidMoves(board,-1, true)
                         .stream()
                         .anyMatch(move -> move.getDestination() == position));
     }
@@ -124,7 +124,7 @@ public class MoveHelper {
                 .stream()
                 .filter(piece -> !piece.equals(pieceOwner))
                 .anyMatch(piece -> piece
-                        .getValidMoves(board, true)
+                        .getValidMoves(board,-1, true)
                         .stream()
                         .anyMatch(move -> move.getDestination() == position));
     }
@@ -143,12 +143,44 @@ public class MoveHelper {
         return player
                 .getActivePieces()
                 .stream()
-                .anyMatch(piece1 -> piece1.getValidMoves(board, true)
+                .anyMatch(piece1 -> piece1.getValidMoves(board,-1, true)
                         .stream()
                         .filter(move -> move.getDestination() == piece.getPiecePosition())
                         .map(Move::getDestination)
                         .collect(Collectors.toList())
                         .contains(piece.getPiecePosition()));
+    }
+
+    public static boolean goesToBetterPosition(Move move, int previousPosition) {
+        Piece piece = move.getPiece();
+        System.out.println(piece.getPreferredPositions()[move.getDestination()]);
+        System.out.println(piece.getPreferredPositions()[previousPosition]);
+        return piece.getPreferredPositions()[move.getDestination()] - piece.getPreferredPositions()[previousPosition] >= -5;
+    }
+
+    //Получаем на вход список возможных ходов(атак!) и выбираем среди них самую приоритетную для будущего исхода игры
+    // Т.е. выберется такой ход, после которого фигура снова сможет атаковать какую-нибудь фигуру врага
+    //В том числе это заставит компьютер выбирать ход, который приводит к шаху или мату противника.
+    public static Move getBestAttackMove(Board board, Player player,  List<Move> moves){
+        Optional<Move> max1 = moves.stream().max(Comparator.comparingInt(move -> move.getAttackedPiece().getPieceValue()));
+        if (max1.isPresent() && max1.get().getAttackedPiece().getPieceValue() >= 900) return max1.get();
+        Map<Move, Integer> map = new HashMap<>();
+        moves.forEach(move -> move.getPiece().getValidMoves(board, move.getDestination(), false)
+                .stream()
+                .filter(move1 -> move1.isAttack() &&
+                        move.getPiece().getPiecePosition() != move1.getDestination() &&
+                        (!MoveHelper.isProtectedWithAllies(board, move1.getDestination(), player.getOpponent()) ||
+                                MoveHelper.isProtectedWithoutOwner(board, move.getPiece(), move1.getDestination(), player) ||
+                                move.getPiece().getPieceType().equals(PieceType.PAWN))
+                ) .forEach(move1 -> map.put(move, map.get(move) != null ? map.get(move) + move1.getAttackedPiece().getPieceValue() + 1 : move1.getAttackedPiece().getPieceValue() + 1))
+        );
+// + 1 выше - счетчик фигур, которые сможем атаковать на следующем ходе
+        Optional<Map.Entry<Move, Integer>> max = map.entrySet().stream().max(Map.Entry.comparingByValue());
+        if (max.isPresent() && (max.get().getKey().getAttackedPiece().getPieceValue() >= max1.get().getAttackedPiece().getPieceValue() ||
+                max.get().getValue() % 100 >= 2
+        )) {
+            return max.get().getKey();
+        } else return moves.get(0);
     }
 
 
