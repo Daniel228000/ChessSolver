@@ -18,6 +18,7 @@ public class MiniMax implements MoveStrategy {
     private final MoveFinder safetyAnalyzer = new KingSafetyAnalyzer();
     private final MoveFinder rescueFinder = new RescueFinder();
     private final MoveFinder attackFinder = new AttackFinder();
+    private final MoveFinder checkMateFinder = new CheckMateFinder();
     private final MoveFinder checkOrNextAttackFinder = new CheckOrNextAttackFinder();
     private int previousBestMovePosition = -1;
 
@@ -60,6 +61,7 @@ public class MiniMax implements MoveStrategy {
                     }
                     if (j >= countMoves / 2 &&
                             (MoveHelper.goesToBetterPosition(move, previousPosition) &&
+                                    !MoveHelper.isPositionProtected(board, move.getPiece(), move.getDestination()) &&
                                     StandardBoardEvaluator.evaluateAttackedPieces(moveTransition.getFromBoard(), player) -
                                             StandardBoardEvaluator.evaluateAttackedPieces(moveTransition.getToBoard(), player) < 201) &&
                     move.getDestination() != previousBestMovePosition){
